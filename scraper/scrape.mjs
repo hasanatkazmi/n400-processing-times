@@ -56,17 +56,22 @@ async function waitOptions(page, sel, min = 2, tries = 30) {
   return await selectOptions(page, sel);
 }
 
-async function clearChallenge(page) {
-  console.error('Loading USCIS and clearing Cloudflare…');
-  await page.goto(`${BASE}/`, { waitUntil: 'domcontentloaded', timeout: 90000 });
-  for (let i = 0; i < 20; i++) {
-    const t = await page.title().catch(() => '?');
-    if (!/just a moment|verif|attention required/i.test(t)) {
-      // ensure the form is present
-      const hasForm = await page.$('#formName');
-      if (hasForm) { console.error(`Cleared (title: ${t}).`); return true; }
+// Load the site and wait for Turnstile to clear. From a datacenter IP the
+// challenge sometimes never resolves on the first page load but does on a
+// fresh one, so reload and try again a few times before giving up.
+async function clearChallenge(page, attempts = 3) {
+  for (let a = 1; a <= attempts; a++) {
+    console.error(a === 1 ? 'Loading USCIS and clearing Cloudflare…'
+                          : `Cloudflare not cleared, reloading (attempt ${a}/${attempts})…`);
+    try { await page.goto(`${BASE}/`, { waitUntil: 'domcontentloaded', timeout: 90000 }); }
+    catch (e) { console.error(`  load failed: ${e.message}`); continue; }
+    for (let i = 0; i < 24; i++) {                       // up to ~60s per attempt
+      const t = await page.title().catch(() => '?');
+      if (!/just a moment|verif|attention required/i.test(t) && await page.$('#formName')) {
+        console.error(`Cleared (title: ${t}).`); return true;
+      }
+      await sleep(2500);
     }
-    await sleep(2500);
   }
   return false;
 }
