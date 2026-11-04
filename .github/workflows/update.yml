@@ -10,6 +10,7 @@ name: Refresh N-400 processing times
 on:
   schedule:
     - cron: '17 11 * * *'   # daily ~11:17 UTC
+    - cron: '41 23 * * *'   # second try ~23:41 UTC from a different runner, in case Cloudflare blocked the first
   workflow_dispatch:        # manual "Run workflow" button
 
 permissions:
