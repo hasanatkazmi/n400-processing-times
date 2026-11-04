@@ -34,11 +34,10 @@ jobs:
           node-version: 20
           cache: npm
 
-      - name: Install Chrome
-        id: chrome
-        uses: browser-actions/setup-chrome@v1
-        with:
-          chrome-version: stable
+      # The runner image ships real Google Chrome. Cloudflare's Turnstile is
+      # more likely to pass with it than with a plain Chromium build.
+      - name: Check Chrome
+        run: google-chrome --version
 
       - name: Install Xvfb
         run: sudo apt-get update && sudo apt-get install -y xvfb
@@ -48,7 +47,7 @@ jobs:
 
       - name: Scrape USCIS
         env:
-          CHROME_PATH: ${{ steps.chrome.outputs.chrome-path }}
+          CHROME_PATH: /usr/bin/google-chrome
           DISABLE_XVFB: 'true'
         run: xvfb-run -a --server-args="-screen 0 1300x1000x24" node scraper/scrape.mjs
 
