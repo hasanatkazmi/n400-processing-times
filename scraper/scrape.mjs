@@ -144,7 +144,12 @@ async function main() {
       await page.select('#officeSc', off.v);
       await sleep(300);
       await page.click('#buttonGetProcessingTime').catch(() => {});
-      const { months, raw } = await readResult(page, off.t);
+      let { months, raw } = await readResult(page, off.t);
+      if (raw === 'timeout') {                      // the site's lookup stalls now and then; one more try
+        await page.click('#buttonGetProcessingTime').catch(() => {});
+        ({ months, raw } = await readResult(page, off.t));
+        raw += ' (retried)';
+      }
       const { city, state } = splitOffice(off.t);
       results.push({ code: off.v, office: off.t, city, state, months });
       console.error(`  [${idx + 1}/${offices.length}] ${off.t.padEnd(24)} ${months ?? '—'} mo  (${raw})`);
