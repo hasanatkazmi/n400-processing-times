@@ -5,14 +5,14 @@
   "unit": "months",
   "note": "80% of cases are completed within this many months",
   "source": "https://egov.uscis.gov/processing-times/",
-  "updated": "2026-11-03T18:26:38.384Z",
+  "updated": "2026-11-04T21:09:34.863Z",
   "offices": [
     {
       "code": "AGA",
       "office": "Agana GU",
       "city": "Agana",
       "state": "GU",
-      "months": 13
+      "months": null
     },
     {
       "code": "ALB",
@@ -26,7 +26,7 @@
       "office": "Albuquerque NM",
       "city": "Albuquerque",
       "state": "NM",
-      "months": 13
+      "months": null
     },
     {
       "code": "ANC",
@@ -47,7 +47,7 @@
       "office": "Baltimore MD",
       "city": "Baltimore",
       "state": "MD",
-      "months": 15
+      "months": null
     },
     {
       "code": "BOI",
@@ -89,7 +89,7 @@
       "office": "Charleston SC",
       "city": "Charleston",
       "state": "SC",
-      "months": 11.5
+      "months": null
     },
     {
       "code": "CHA",
@@ -103,7 +103,7 @@
       "office": "Charlotte NC",
       "city": "Charlotte",
       "state": "NC",
-      "months": 11
+      "months": null
     },
     {
       "code": "CHI",
@@ -138,7 +138,7 @@
       "office": "Columbus OH",
       "city": "Columbus",
       "state": "OH",
-      "months": 10.5
+      "months": null
     },
     {
       "code": "NJC",
@@ -222,7 +222,7 @@
       "office": "Hartford CT",
       "city": "Hartford",
       "state": "CT",
-      "months": 11.5
+      "months": null
     },
     {
       "code": "HEL",
@@ -299,7 +299,7 @@
       "office": "Lawrence MA",
       "city": "Lawrence",
       "state": "MA",
-      "months": 18
+      "months": null
     },
     {
       "code": "LNY",
@@ -313,7 +313,7 @@
       "office": "Los Angeles CA",
       "city": "Los Angeles",
       "state": "CA",
-      "months": 10.5
+      "months": null
     },
     {
       "code": "LAC",
@@ -488,7 +488,7 @@
       "office": "Queens NY",
       "city": "Queens",
       "state": "NY",
-      "months": null
+      "months": 10.5
     },
     {
       "code": "RAL",
@@ -639,7 +639,7 @@
     }
   ],
   "previous": {
-    "updated": "2026-10-24T14:35:41.372Z",
+    "updated": "2026-11-03T18:26:38.384Z",
     "byCode": {
       "AGA": 13,
       "ALB": 10,
@@ -649,6 +649,7 @@
       "BAL": 15,
       "BOI": 15,
       "BOS": 13.5,
+      "BNY": 11,
       "BUF": 14.5,
       "STA": 10.5,
       "CHL": 11.5,
@@ -672,23 +673,31 @@
       "HLG": 11.5,
       "HAR": 11.5,
       "HEL": 9.5,
+      "HIA": 9.5,
       "HHW": 12.5,
+      "HOU": 12,
       "IMP": 14.5,
       "INP": 14,
+      "JAC": 15,
+      "KAN": 12.5,
       "KND": 10,
       "LVG": 13,
       "LAW": 18,
+      "LNY": 12,
       "LOS": 10.5,
       "LAC": 10.5,
       "LOU": 10.5,
       "MAN": 10.5,
       "MEM": 12,
+      "MIA": 10,
+      "MIL": 14,
       "SPM": 14.5,
       "MGA": 9.5,
       "MTL": 10,
       "NTN": 13,
       "NEW": 11.5,
       "NOL": 12.5,
+      "NYC": 10,
       "NOR": 10.5,
       "OKL": 12.5,
       "OKC": 13,
@@ -696,7 +705,12 @@
       "ORL": 13.5,
       "PHI": 11.5,
       "PHO": 12,
+      "PIT": 11.5,
+      "POM": 14.5,
       "POO": 14.5,
+      "PRO": 10,
+      "RAL": 12,
+      "REN": 11.5,
       "SAC": 16,
       "STL": 12.5,
       "SLC": 13.5,
@@ -713,6 +727,7 @@
       "TAM": 13.5,
       "TUC": 12,
       "WAS": 11.5,
+      "WPB": 10,
       "WIC": 13,
       "YAK": 13.5
     }
