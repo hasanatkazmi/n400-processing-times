@@ -125,17 +125,22 @@ async function main() {
   try {
     if (!(await clearChallenge(page))) throw new Error('Could not clear Cloudflare challenge.');
 
-    // Select form + category, then read the office list.
-    await page.select('#formName', FORM);
-    await sleep(1200);
-    await waitOptions(page, '#formCategory', 2);
-    await page.select('#formCategory', CATEGORY);
-    await sleep(1500);
-
-    let offices = (await waitOptions(page, '#officeSc', 3)) || [];
-    offices = offices.filter((o) => o.v && !/select one/i.test(o.t));
-    if (ONLY.length) offices = offices.filter((o) => ONLY.includes(o.v));
-    console.error(`Found ${offices.length} offices for ${FORM}.`);
+    // Select form + category, then read the office list. The SPA sometimes
+    // ignores a select or is slow to fill the office list, so retry a few times.
+    let all = [];
+    for (let attempt = 1; attempt <= 3 && !all.length; attempt++) {
+      if (attempt > 1) console.error(`Office list empty, retrying (${attempt}/3)…`);
+      await page.select('#formName', FORM);
+      await sleep(1200);
+      await waitOptions(page, '#formCategory', 2);
+      await page.select('#formCategory', CATEGORY);
+      await sleep(1500);
+      all = ((await waitOptions(page, '#officeSc', 3, 60)) || [])
+        .filter((o) => o.v && !/select one/i.test(o.t));
+    }
+    const offices = ONLY.length ? all.filter((o) => ONLY.includes(o.v)) : all;
+    console.error(`Found ${all.length} offices for ${FORM}` +
+      (ONLY.length ? `, ${offices.length} matching ONLY=${ONLY.join(',')}.` : '.'));
     if (!offices.length) throw new Error('No offices returned.');
 
     const results = [];
