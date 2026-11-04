@@ -25,6 +25,8 @@ jobs:
     timeout-minutes: 25
     steps:
       - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0   # history/offices.json is built from every past data.json
 
       - uses: actions/setup-node@v4
         with:
@@ -49,14 +51,17 @@ jobs:
           DISABLE_XVFB: 'true'
         run: xvfb-run -a --server-args="-screen 0 1300x1000x24" node scraper/scrape.mjs
 
+      - name: Build per-office history
+        run: node scraper/history.mjs
+
       - name: Commit if changed
         run: |
-          if git diff --quiet -- data.json; then
+          if git diff --quiet -- data.json history/offices.json; then
             echo "No change in data.json."
           else
             git config user.name  "github-actions[bot]"
             git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-            git add data.json
+            git add data.json history/offices.json
             git commit -m "Update N-400 processing times ($(date -u +%Y-%m-%d))"
             git push
           fi

@@ -48,6 +48,16 @@ expected occasional failure. When it works it commits `data.json` automatically.
 
 Either way, tapping **Refresh** in the app pulls the newest committed `data.json`.
 
+### Trends over time
+
+The app shows each office's processing time over time: a chart on the San Jose
+card, a sparkline on every row, and a full chart (tap any row or map dot) with
+the list of changes. The data comes from `history/offices.json`, which
+`scraper/history.mjs` builds by folding every committed `data.json` (plus the
+current one) into one snapshot per day. The Action and `npm run update` rebuild
+it after each scrape; `npm run history` rebuilds it by hand. Trends ignore manual
+overrides.
+
 ## Files
 
 | File | Purpose |
@@ -56,6 +66,8 @@ Either way, tapping **Refresh** in the app pulls the newest committed `data.json
 | `data.json` | Latest scraped numbers + the previous snapshot for deltas. |
 | `us-states-10m.json` | US base-map geometry (drawn with D3 `geoAlbersUsa`). |
 | `scraper/scrape.mjs` | Node scraper that produces `data.json`. |
+| `scraper/history.mjs` | Folds git history of `data.json` into `history/offices.json` (no network). |
+| `history/offices.json` | Every office's processing time on every scraped date; feeds the trend charts. |
 | `.github/workflows/update.yml` | Scheduled/manual refresh job. |
 
 ## Deploy (GitHub Pages)

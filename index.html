@@ -101,11 +101,52 @@
   ul.list li:last-child{border-bottom:0}
   ul.list li.sj{background:linear-gradient(90deg,rgba(96,165,250,.10),transparent)}
   .swatch{width:10px;height:10px;border-radius:50%}
-  .oname{font-weight:550} .oname .st{color:var(--muted);font-weight:400;font-size:12.5px;margin-left:6px}
+  .oname{font-weight:550;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+  .oname .st{color:var(--muted);font-weight:400;font-size:12.5px;margin-left:6px}
+  ul.list li.hist{grid-template-columns:12px 1fr 64px auto auto;gap:8px;cursor:pointer}
+  ul.list li.hist .omo{min-width:40px} ul.list li.hist .odelta{min-width:44px}
+  ul.list li.hist:active{background:var(--panel-2)}
+  ul.list li.hist:focus-visible{outline:2px solid var(--accent);outline-offset:-2px}
+  .spark{width:64px;height:20px;display:block}
+  .spark path{fill:none;stroke:var(--ink-2);stroke-width:1.5;stroke-linejoin:round;opacity:.8}
+  .spark circle{fill:var(--accent)}
   .omo{font-variant-numeric:tabular-nums;font-weight:650;font-size:15px;text-align:right;min-width:52px}
   .odelta{font-size:12px;text-align:right;min-width:56px;font-variant-numeric:tabular-nums}
   .odelta.up{color:var(--bad)} .odelta.down{color:var(--good)} .odelta.flat{color:var(--muted)}
   .edited{display:inline-block;width:6px;height:6px;border-radius:50%;background:var(--accent);margin-left:6px;vertical-align:middle}
+
+  /* Trend charts */
+  .trendwrap{position:relative;margin-top:12px}
+  .trendwrap[hidden]{display:none}
+  svg.trend{display:block;width:100%;height:auto;touch-action:pan-y}
+  svg.trend text{font-family:inherit}
+  .ttip{position:absolute;left:0;top:0;pointer-events:none;z-index:5;opacity:0;transform:translate(-50%,-100%);
+    background:#0d1428;border:1px solid var(--line);border-radius:10px;padding:6px 9px;
+    box-shadow:var(--shadow);font-size:12px;white-space:nowrap;transition:opacity .1s}
+  .ttip b{font-size:14px}
+  .trendfoot{display:flex;flex-wrap:wrap;gap:6px 14px;margin-top:8px;font-size:12.5px;color:var(--muted)}
+  .trendfoot[hidden]{display:none}
+  .trendfoot b{color:var(--ink)}
+
+  /* Office detail sheet */
+  .sheet{position:fixed;inset:0;z-index:30;display:flex;align-items:flex-end;justify-content:center}
+  .sheet[hidden]{display:none}
+  .sheet .back{position:absolute;inset:0;background:rgba(4,8,20,.62)}
+  .sheet .panel{position:relative;width:100%;max-width:720px;max-height:88vh;overflow:auto;
+    background:var(--panel);border:1px solid var(--line);border-radius:18px 18px 0 0;
+    padding:12px 16px calc(18px + env(safe-area-inset-bottom));box-shadow:var(--shadow)}
+  .sheet .grab{width:38px;height:4px;border-radius:2px;background:var(--line);margin:0 auto 12px}
+  .sheet .close{position:absolute;top:12px;right:12px;padding:5px 10px;border-radius:10px;font-size:13px}
+  .sheet .office{font-size:19px;font-weight:650;padding-right:48px}
+  .sheet .bignum{display:flex;align-items:baseline;gap:8px;margin:6px 0 2px}
+  .sheet .bignum .n{font-size:40px;font-weight:750;line-height:1;letter-spacing:-.02em}
+  .sheet .bignum .u{font-size:15px;color:var(--ink-2)}
+  .changes{margin:12px 0 0;padding:0;list-style:none;font-size:13.5px}
+  .changes li{display:grid;grid-template-columns:auto auto 1fr;gap:12px;align-items:baseline;padding:7px 0;border-top:1px solid var(--line)}
+  .changes li:first-child{border-top:0}
+  .changes .d{color:var(--muted);text-align:right}
+  .changes .c{font-size:12.5px;font-variant-numeric:tabular-nums}
+  .changes .c.up{color:var(--bad)} .changes .c.down{color:var(--good)} .changes .c.flat{color:var(--muted)}
 
   /* Manual + footer */
   details.manual{margin-top:16px;border:1px solid var(--line);border-radius:14px;background:var(--panel);overflow:hidden}
@@ -147,6 +188,11 @@
     <div class="bignum"><span class="n" id="heroNum">—</span><span class="u">months</span>
       <span id="heroDelta" class="chip flat" style="margin-left:auto">—</span></div>
     <div class="sub muted" id="heroSub">Field office · 80% of cases completed within</div>
+    <div class="trendwrap" id="heroTrend" hidden>
+      <svg class="trend" role="img" aria-label="San Jose processing time over time"></svg>
+      <div class="ttip"></div>
+    </div>
+    <div class="trendfoot" id="heroTrendFoot" hidden></div>
     <div class="meta">
       <span>Updated <b id="heroUpdated">—</b></span>
       <span>National median <b id="statMedian">—</b> mo</span>
@@ -203,9 +249,31 @@
 
   <footer>
     Data scraped from <a href="https://egov.uscis.gov/processing-times/" target="_blank" rel="noopener">egov.uscis.gov/processing-times</a>.
-    Deltas compare the two most recent updates. Unofficial; for reference only.<br>
+    Deltas compare the two most recent updates; trends use every past update. Unofficial; for reference only.<br>
     <span id="lastChecked"></span>
   </footer>
+
+  <!-- Office detail (trend) sheet -->
+  <div class="sheet" id="sheet" hidden role="dialog" aria-modal="true" aria-labelledby="shOffice">
+    <div class="back" id="sheetBack"></div>
+    <div class="panel">
+      <div class="grab"></div>
+      <button class="close" id="sheetClose" aria-label="Close">✕</button>
+      <div class="office" id="shOffice">—</div>
+      <div class="bignum"><span class="n" id="shNum">—</span><span class="u">months</span>
+        <span id="shDelta" class="chip flat" style="margin-left:auto">—</span></div>
+      <div class="muted" style="font-size:12.5px" id="shSub"></div>
+      <div class="trendwrap" id="shTrend" hidden>
+        <svg class="trend" role="img" aria-label="Processing time over time"></svg>
+        <div class="ttip"></div>
+      </div>
+      <div class="trendfoot" id="shFoot"></div>
+      <ul class="changes" id="shChanges"></ul>
+      <p class="muted" style="font-size:12px;margin:12px 0 0">
+        Trend is built from every committed scrape, one reading per day. Manual overrides on this device are not included.
+      </p>
+    </div>
+  </div>
 
   <div class="toast" id="toast"></div>
 
@@ -296,6 +364,134 @@ function deltaChip(el, dv, {chip=false}={}){
   else { el.classList.add('flat'); el.textContent = chip?'no change':'0'; }
 }
 
+/* -------- history / trends -------- */
+const SPARK_W=72, SPARK_H=22;
+const parseDay=(s)=>new Date(s+'T12:00:00Z');   // noon UTC: the same calendar day in every US zone
+const fmtDay=d3.timeFormat('%b %-d');
+// Precompute per-office series, change points and a sparkline path once per load,
+// so renderList (which runs on every keystroke) only pastes strings.
+function prepHistory(h){
+  if(!h||!Array.isArray(h.dates)||!h.offices||h.dates.length<2) return null;
+  const dates=h.dates.map(parseDay);
+  const minDate=dates[0], maxDate=dates[dates.length-1];
+  const sx=d3.scaleTime().domain([minDate,maxDate]).range([1,SPARK_W-3]);
+  const byCode={};
+  for(const [code,o] of Object.entries(h.offices)){
+    const series=[]; (o.months||[]).forEach((m,i)=>{ if(m!=null&&dates[i]) series.push({d:dates[i],m}); });
+    if(!series.length) continue;
+    const changes=series.filter((p,i)=>i===0||p.m!==series[i-1].m);
+    const [lo,hi]=d3.extent(series,p=>p.m); const pad=Math.max(.5,(hi-lo)*.25);
+    const sy=d3.scaleLinear().domain([lo-pad,hi+pad]).range([SPARK_H-2,2]);
+    const path=d3.line().x(p=>sx(p.d)).y(p=>sy(p.m)).curve(d3.curveStepAfter)(series);
+    const last=series[series.length-1];
+    byCode[code]={series,changes,first:series[0],last,
+      spark:'<svg class="spark" viewBox="0 0 '+SPARK_W+' '+SPARK_H+'" aria-hidden="true"><path d="'+path+'"/>'+
+            '<circle cx="'+sx(last.d).toFixed(1)+'" cy="'+sy(last.m).toFixed(1)+'" r="2.2"/></svg>'};
+  }
+  return {dates,minDate,maxDate,byCode};
+}
+async function loadHistory(bust){
+  try{
+    const r=await fetch('./history/offices.json'+(bust?('?t='+Date.now()):''),{cache:'no-store'});
+    if(!r.ok) return null;                       // not deployed yet -> no trend UI
+    return prepHistory(await r.json());
+  }catch{ return null; }
+}
+const hist=(code)=> state.hist?(state.hist.byCode[code]||null):null;
+
+// Full step chart with crosshair tooltip, drawn into a .trendwrap. Returns false (and hides it) if no data.
+function drawTrend(wrap, code){
+  const s=hist(code), svgEl=wrap.querySelector('svg'), tip=wrap.querySelector('.ttip');
+  const svg=d3.select(svgEl); svg.selectAll('*').remove();
+  svg.on('pointermove',null).on('pointerdown',null).on('pointerleave',null);
+  if(!s||s.series.length<2){ wrap.hidden=true; return false; }
+  wrap.hidden=false;
+  const W=Math.max(280, wrap.clientWidth||600), H=150, M={t:20,r:40,b:26,l:6};
+  svg.attr('viewBox','0 0 '+W+' '+H).attr('width',W).attr('height',H);
+  const x=d3.scaleTime().domain([state.hist.minDate,state.hist.maxDate]).range([M.l,W-M.r]);
+  const [lo,hi]=d3.extent(s.series,p=>p.m); const pad=Math.max(.5,(hi-lo)*.3);
+  const y=d3.scaleLinear().domain([lo-pad,hi+pad]).range([H-M.b,M.t]).nice(3);
+  const yt=y.ticks(3);
+  svg.append('g').selectAll('line').data(yt).join('line')
+    .attr('x1',M.l).attr('x2',W-M.r).attr('y1',d=>y(d)).attr('y2',d=>y(d)).attr('stroke','var(--line)');
+  svg.append('g').selectAll('text').data(yt).join('text')
+    .attr('x',W-M.r+8).attr('y',d=>y(d)).attr('dy','.35em').attr('fill','var(--muted)').attr('font-size',11).text(d=>d);
+  const xt=x.ticks(Math.max(2,Math.min(6,Math.round(W/120))));
+  svg.append('g').selectAll('text').data(xt).join('text')
+    .attr('x',d=>x(d)).attr('y',H-8).attr('fill','var(--muted)').attr('font-size',11).text(fmtDay)
+    .attr('text-anchor',d=>x(d)<M.l+22?'start':x(d)>W-M.r-22?'end':'middle');   // keep edge labels inside
+  // rug: one tick per reading, so gaps in the data stay visible
+  svg.append('g').selectAll('line').data(s.series).join('line')
+    .attr('x1',p=>x(p.d)).attr('x2',p=>x(p.d)).attr('y1',H-M.b+2).attr('y2',H-M.b+6)
+    .attr('stroke','var(--muted)').attr('stroke-opacity',.6);
+  const line=d3.line().x(p=>x(p.d)).y(p=>y(p.m)).curve(d3.curveStepAfter);
+  svg.append('path').datum(s.series).attr('d',line).attr('fill','none')
+    .attr('stroke','var(--accent)').attr('stroke-width',2).attr('stroke-linejoin','round');
+  svg.append('g').selectAll('circle').data(s.changes).join('circle')
+    .attr('cx',p=>x(p.d)).attr('cy',p=>y(p.m)).attr('r',4)
+    .attr('fill','var(--accent)').attr('stroke','var(--panel)').attr('stroke-width',2);
+  svg.append('text').attr('x',x(s.last.d)).attr('y',y(s.last.m)-10).attr('text-anchor','end')
+    .attr('fill','var(--ink)').attr('font-size',12).attr('font-weight',600).text(fmtMonths(s.last.m)+' mo');
+  // crosshair + tooltip
+  const cross=svg.append('line').attr('y1',M.t).attr('y2',H-M.b).attr('stroke','var(--ink-2)')
+    .attr('stroke-dasharray','3 3').style('opacity',0);
+  const dot=svg.append('circle').attr('r',4.5).attr('fill','var(--ink)').style('opacity',0);
+  const nearest=d3.bisector(p=>p.d).center;
+  const move=(e)=>{
+    const [mx]=d3.pointer(e,svgEl); const p=s.series[nearest(s.series,x.invert(mx))]; if(!p) return;
+    cross.attr('x1',x(p.d)).attr('x2',x(p.d)).style('opacity',1);
+    dot.attr('cx',x(p.d)).attr('cy',y(p.m)).style('opacity',1);
+    const k=svgEl.getBoundingClientRect().width/W;
+    tip.innerHTML='<b>'+fmtMonths(p.m)+' mo</b> · '+fmtDate(p.d);
+    tip.style.left=Math.max(64,Math.min(W*k-64,x(p.d)*k))+'px'; tip.style.top=(y(p.m)*k-10)+'px'; tip.style.opacity=1;
+  };
+  const leave=()=>{ cross.style('opacity',0); dot.style('opacity',0); tip.style.opacity=0; };
+  svg.on('pointermove',move).on('pointerdown',move).on('pointerleave',leave);
+  return true;
+}
+function trendFootHTML(code){
+  const s=hist(code); if(!s) return '';
+  const d=Math.round((s.last.m-s.first.m)*10)/10;
+  const col=d>0?'var(--bad)':d<0?'var(--good)':'var(--muted)';
+  const txt=d===0?'no change':(d>0?'▲ +':'▼ ')+fmtMonths(d)+' mo';
+  const n=s.changes.length-1;
+  return '<span>Since '+fmtDate(s.first.d)+': <b style="color:'+col+'">'+txt+'</b></span>'+
+         '<span><b>'+s.series.length+'</b> readings · <b>'+n+'</b> change'+(n===1?'':'s')+'</span>';
+}
+
+/* -------- office detail sheet -------- */
+function openDetail(code){
+  const o=state.data.offices.find(x=>x.code===code); if(!o) return;
+  hideTip();
+  const sh=$('#sheet'); sh.hidden=false; document.body.style.overflow='hidden';
+  $('#shOffice').textContent=(code===SJ?'★ ':'')+o.city+(o.state?', '+o.state:'');
+  const m=effMonths(code);
+  $('#shNum').textContent=fmtMonths(m); $('#shNum').style.color=(m!=null&&state.color)?state.color(m):'';
+  deltaChip($('#shDelta'), delta(code), {chip:true});
+  $('#shSub').textContent='Field office · 80% of cases completed within · updated '+fmtDate(state.data.updated);
+  const ok=drawTrend($('#shTrend'), code);
+  $('#shFoot').innerHTML= ok?trendFootHTML(code):'<span>No history for this office yet.</span>';
+  const ul=$('#shChanges'); ul.innerHTML='';
+  const s=hist(code);
+  if(s){
+    s.changes.forEach((p,i)=>{
+      const li=document.createElement('li');
+      const prev=i?s.changes[i-1].m:null; const dv=prev==null?null:Math.round((p.m-prev)*10)/10;
+      const c=dv==null?'first reading':(dv>0?'▲ +':'▼ ')+fmtMonths(dv);
+      li.innerHTML='<span><b>'+fmtMonths(p.m)+'</b> mo</span>'+
+        '<span class="c '+(dv==null?'flat':dv>0?'up':'down')+'">'+c+'</span>'+
+        '<span class="d">'+fmtDate(p.d)+'</span>';
+      ul.append(li);
+    });
+  }
+  sh.querySelector('.panel').scrollTop=0;
+  $('#sheetClose').focus({preventScroll:true});
+}
+function closeDetail(){ $('#sheet').hidden=true; document.body.style.overflow=''; }
+$('#sheetBack').addEventListener('click',closeDetail);
+$('#sheetClose').addEventListener('click',closeDetail);
+window.addEventListener('keydown',e=>{ if(e.key==='Escape'&&!$('#sheet').hidden) closeDetail(); });
+
 /* -------- render pieces -------- */
 function renderHero(){
   const m=effMonths(SJ);
@@ -311,6 +507,9 @@ function renderHero(){
   $('#heroSub').textContent = state.prev
     ? 'Field office · Δ '+state.prev.label+' ('+fmtDate(state.prev.when)+')'
     : 'Field office · 80% of cases completed within';
+  const tf=$('#heroTrendFoot');
+  if(drawTrend($('#heroTrend'), SJ)){ tf.hidden=false; tf.innerHTML=trendFootHTML(SJ); }
+  else tf.hidden=true;
 }
 
 function renderMap(){
@@ -344,7 +543,7 @@ function renderMap(){
     .on('pointerenter',(e,p)=>showTip(e,p))
     .on('pointermove',(e,p)=>showTip(e,p))
     .on('pointerleave',hideTip)
-    .on('click',(e,p)=>{e.stopPropagation();showTip(e,p);});
+    .on('click',(e,p)=>{e.stopPropagation(); if(state.hist) openDetail(p.o.code); else showTip(e,p);});
 
   // legend gradient
   const bar=$('#legBar');
@@ -391,10 +590,12 @@ function renderList(){
   // pin San Jose on top (unless filtered out)
   const sjIdx=rows.findIndex(r=>r.o.code===SJ);
   if(sjIdx>0){ rows.unshift(rows.splice(sjIdx,1)[0]); }
-  $('#listCount').textContent=rows.length+' offices';
+  const H=!!state.hist;
+  $('#listCount').textContent=rows.length+' offices'+(H?' · tap for trend':'');
 
   for(const r of rows){
-    const li=document.createElement('li'); if(r.o.code===SJ) li.className='sj';
+    const li=document.createElement('li');
+    li.className=(r.o.code===SJ?'sj':'')+(H?' hist':'');
     const sw=document.createElement('span'); sw.className='swatch';
     sw.style.background=(r.m!=null&&state.color)?state.color(r.m):'#333';
     const name=document.createElement('div'); name.className='oname';
@@ -403,7 +604,14 @@ function renderList(){
     const mo=document.createElement('div'); mo.className='omo';
     mo.textContent=fmtMonths(r.m); mo.style.color=(r.m!=null&&state.color)?state.color(r.m):'';
     const dl=document.createElement('div'); deltaChip(dl, delta(r.o.code));
-    li.append(sw,name,mo,dl); ul.append(li);
+    if(H){
+      const sp=document.createElement('div'); const s=hist(r.o.code); sp.innerHTML=s?s.spark:'';
+      li.append(sw,name,sp,mo,dl);
+      li.tabIndex=0; li.setAttribute('role','button'); li.setAttribute('aria-label',r.o.office+' trend');
+      li.onclick=()=>openDetail(r.o.code);
+      li.onkeydown=(e)=>{ if(e.key==='Enter'||e.key===' '){ e.preventDefault(); openDetail(r.o.code); } };
+    } else li.append(sw,name,mo,dl);
+    ul.append(li);
   }
 }
 
@@ -447,9 +655,9 @@ function toast(msg){ const t=$('#toast'); t.textContent=msg; t.classList.add('sh
 async function refresh(){
   const btn=$('#refreshBtn'); btn.classList.add('loading');
   try{
-    const fresh=await loadData(true);
+    const [fresh,h]=await Promise.all([loadData(true), loadHistory(true)]);
     const changed = !state.data || fresh.updated!==state.data.updated;
-    state.data=fresh; state.prev=computePrev(); renderAll(); saveBaseline();
+    state.data=fresh; state.hist=h; state.prev=computePrev(); renderAll(); saveBaseline();
     $('#lastChecked').textContent='Last checked '+new Date().toLocaleString();
     toast(changed?('Updated · '+fmtDate(fresh.updated)):'Up to date · no change');
   }catch(e){ toast('Refresh failed — showing last data'); }
@@ -468,11 +676,11 @@ $('#mSave').addEventListener('click',()=>{
   $('#mMonths').value=''; renderAll(); toast('Saved override');
 });
 $('#map').addEventListener('click',hideTip);
-window.addEventListener('resize',()=>{ if(state.data) renderMap(); });
+window.addEventListener('resize',()=>{ if(state.data){ renderMap(); drawTrend($('#heroTrend'),SJ); } });
 
 /* -------- boot -------- */
 (async function(){
-  await loadMap();
+  const [,h]=await Promise.all([loadMap(), loadHistory(false)]); state.hist=h;
   try{
     state.data=await loadData(false);
     state.prev=computePrev(); renderAll(); saveBaseline();
