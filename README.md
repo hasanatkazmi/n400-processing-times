@@ -48,6 +48,19 @@ expected occasional failure. When it works it commits `data.json` automatically.
 
 Either way, tapping **Refresh** in the app pulls the newest committed `data.json`.
 
+### San Jose history
+
+`data.json` only remembers one prior snapshot. To track San Jose over time:
+
+```bash
+npm run sanjose              # scrape San Jose only, save to history/sanjose.json, print a chart
+npm run sanjose -- --show    # print the saved history without scraping
+npm run sanjose -- --backfill  # also import every past reading from the git history of data.json
+```
+
+Each run appends one reading per day to `history/sanjose.json`; commit that file to
+keep the history.
+
 ## Files
 
 | File | Purpose |
@@ -56,6 +69,8 @@ Either way, tapping **Refresh** in the app pulls the newest committed `data.json
 | `data.json` | Latest scraped numbers + the previous snapshot for deltas. |
 | `us-states-10m.json` | US base-map geometry (drawn with D3 `geoAlbersUsa`). |
 | `scraper/scrape.mjs` | Node scraper that produces `data.json`. |
+| `scraper/sanjose.mjs` | San Jose-only scrape that appends to `history/sanjose.json` and prints a chart. |
+| `history/sanjose.json` | Every recorded San Jose reading, one per day. |
 | `.github/workflows/update.yml` | Scheduled/manual refresh job. |
 
 ## Deploy (GitHub Pages)

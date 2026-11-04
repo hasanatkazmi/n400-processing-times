@@ -1,0 +1,237 @@
+{
+  "office": "SNJ",
+  "officeName": "San Jose CA",
+  "form": "N-400",
+  "unit": "months",
+  "note": "80% of cases are completed within this many months",
+  "readings": [
+    {
+      "date": "2026-07-30",
+      "updated": "2026-07-30T17:32:28.365Z",
+      "months": 12.5,
+      "source": "git"
+    },
+    {
+      "date": "2026-09-02",
+      "updated": "2026-09-02T15:07:45.037Z",
+      "months": 14.5,
+      "source": "git"
+    },
+    {
+      "date": "2026-09-03",
+      "updated": "2026-09-03T15:01:18.326Z",
+      "months": 14.5,
+      "source": "git"
+    },
+    {
+      "date": "2026-09-04",
+      "updated": "2026-09-04T14:58:35.171Z",
+      "months": 14.5,
+      "source": "git"
+    },
+    {
+      "date": "2026-09-05",
+      "updated": "2026-09-05T13:53:41.683Z",
+      "months": 14.5,
+      "source": "git"
+    },
+    {
+      "date": "2026-09-06",
+      "updated": "2026-09-06T14:11:00.969Z",
+      "months": 14.5,
+      "source": "git"
+    },
+    {
+      "date": "2026-09-07",
+      "updated": "2026-09-07T16:28:39.758Z",
+      "months": 14.5,
+      "source": "git"
+    },
+    {
+      "date": "2026-09-08",
+      "updated": "2026-09-08T15:07:10.840Z",
+      "months": 14.5,
+      "source": "git"
+    },
+    {
+      "date": "2026-09-09",
+      "updated": "2026-09-09T15:07:54.737Z",
+      "months": 14.5,
+      "source": "git"
+    },
+    {
+      "date": "2026-09-11",
+      "updated": "2026-09-11T15:01:37.350Z",
+      "months": 14.5,
+      "source": "git"
+    },
+    {
+      "date": "2026-09-12",
+      "updated": "2026-09-12T14:08:10.301Z",
+      "months": 14.5,
+      "source": "git"
+    },
+    {
+      "date": "2026-09-13",
+      "updated": "2026-09-13T14:57:25.037Z",
+      "months": 14.5,
+      "source": "git"
+    },
+    {
+      "date": "2026-09-17",
+      "updated": "2026-09-17T15:34:08.095Z",
+      "months": 14.5,
+      "source": "git"
+    },
+    {
+      "date": "2026-09-19",
+      "updated": "2026-09-19T14:25:20.172Z",
+      "months": 16,
+      "source": "git"
+    },
+    {
+      "date": "2026-09-20",
+      "updated": "2026-09-20T14:43:25.627Z",
+      "months": 16,
+      "source": "git"
+    },
+    {
+      "date": "2026-09-21",
+      "updated": "2026-09-21T17:03:27.089Z",
+      "months": 16,
+      "source": "git"
+    },
+    {
+      "date": "2026-09-22",
+      "updated": "2026-09-22T15:33:07.359Z",
+      "months": 16,
+      "source": "git"
+    },
+    {
+      "date": "2026-09-23",
+      "updated": "2026-09-23T15:28:40.508Z",
+      "months": 16,
+      "source": "git"
+    },
+    {
+      "date": "2026-09-24",
+      "updated": "2026-09-24T15:51:12.494Z",
+      "months": 16,
+      "source": "git"
+    },
+    {
+      "date": "2026-09-25",
+      "updated": "2026-09-25T15:50:48.886Z",
+      "months": 16,
+      "source": "git"
+    },
+    {
+      "date": "2026-09-26",
+      "updated": "2026-09-26T15:00:40.507Z",
+      "months": 16,
+      "source": "git"
+    },
+    {
+      "date": "2026-09-27",
+      "updated": "2026-09-27T15:40:59.885Z",
+      "months": 16,
+      "source": "git"
+    },
+    {
+      "date": "2026-09-28",
+      "updated": "2026-09-28T18:37:47.074Z",
+      "months": 16,
+      "source": "git"
+    },
+    {
+      "date": "2026-09-29",
+      "updated": "2026-09-29T16:55:19.646Z",
+      "months": 16,
+      "source": "git"
+    },
+    {
+      "date": "2026-09-30",
+      "updated": "2026-09-30T16:50:54.920Z",
+      "months": 16,
+      "source": "git"
+    },
+    {
+      "date": "2026-10-01",
+      "updated": "2026-10-01T17:23:48.614Z",
+      "months": 16,
+      "source": "git"
+    },
+    {
+      "date": "2026-10-02",
+      "updated": "2026-10-02T16:39:44.864Z",
+      "months": 16,
+      "source": "git"
+    },
+    {
+      "date": "2026-10-03",
+      "updated": "2026-10-03T15:10:46.450Z",
+      "months": 16,
+      "source": "git"
+    },
+    {
+      "date": "2026-10-04",
+      "updated": "2026-10-04T15:49:26.777Z",
+      "months": 16,
+      "source": "git"
+    },
+    {
+      "date": "2026-10-05",
+      "updated": "2026-10-05T19:49:10.947Z",
+      "months": 16,
+      "source": "git"
+    },
+    {
+      "date": "2026-10-06",
+      "updated": "2026-10-06T17:12:40.416Z",
+      "months": 16,
+      "source": "git"
+    },
+    {
+      "date": "2026-10-07",
+      "updated": "2026-10-07T17:50:34.342Z",
+      "months": 16,
+      "source": "git"
+    },
+    {
+      "date": "2026-10-20",
+      "updated": "2026-10-20T15:42:35.614Z",
+      "months": 16,
+      "source": "git"
+    },
+    {
+      "date": "2026-10-22",
+      "updated": "2026-10-22T15:55:19.432Z",
+      "months": 16,
+      "source": "git"
+    },
+    {
+      "date": "2026-10-23",
+      "updated": "2026-10-23T15:47:25.355Z",
+      "months": 16,
+      "source": "git"
+    },
+    {
+      "date": "2026-10-24",
+      "updated": "2026-10-24T14:35:41.372Z",
+      "months": 16,
+      "source": "git"
+    },
+    {
+      "date": "2026-11-03",
+      "updated": "2026-11-04T06:32:15.722Z",
+      "months": 16,
+      "source": "scrape"
+    },
+    {
+      "date": "2026-11-04",
+      "updated": "2026-11-04T19:31:10.669Z",
+      "months": 16,
+      "source": "scrape"
+    }
+  ]
+}
