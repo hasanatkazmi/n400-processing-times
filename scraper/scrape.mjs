@@ -111,20 +111,32 @@ function splitOffice(name) {
   return { city: name, state: '' };
 }
 
+const launch = () => connect({
+  headless: (process.env.HEADLESS || '').toLowerCase() === 'true',
+  turnstile: true,
+  // In CI we provide our own virtual display via `xvfb-run`, so tell the lib
+  // not to manage Xvfb itself (set DISABLE_XVFB=true in the workflow).
+  disableXvfb: (process.env.DISABLE_XVFB || '').toLowerCase() === 'true',
+  args: ['--window-size=1300,1000', '--lang=en-US'],
+  customConfig: chromePath() ? { chromePath: chromePath() } : {},
+});
+
+// Open USCIS past Cloudflare. Each launch gets a fresh browser profile, so a
+// Turnstile session that is stuck gets replaced rather than reloaded forever.
+async function openSite(launches = 2) {
+  for (let n = 1; n <= launches; n++) {
+    if (n > 1) console.error(`Relaunching Chrome with a fresh profile (${n}/${launches})…`);
+    const { browser, page } = await launch();
+    if (await clearChallenge(page, 2)) return { browser, page };
+    await browser.close().catch(() => {});
+  }
+  throw new Error('Could not clear Cloudflare challenge.');
+}
+
 async function main() {
-  const { browser, page } = await connect({
-    headless: (process.env.HEADLESS || '').toLowerCase() === 'true',
-    turnstile: true,
-    // In CI we provide our own virtual display via `xvfb-run`, so tell the lib
-    // not to manage Xvfb itself (set DISABLE_XVFB=true in the workflow).
-    disableXvfb: (process.env.DISABLE_XVFB || '').toLowerCase() === 'true',
-    args: ['--window-size=1300,1000', '--lang=en-US'],
-    customConfig: chromePath() ? { chromePath: chromePath() } : {},
-  });
+  const { browser, page } = await openSite();
 
   try {
-    if (!(await clearChallenge(page))) throw new Error('Could not clear Cloudflare challenge.');
-
     // Select form + category, then read the office list. The SPA sometimes
     // ignores a select or is slow to fill the office list, so retry a few times.
     let all = [];

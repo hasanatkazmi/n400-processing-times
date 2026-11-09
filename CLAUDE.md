@@ -25,7 +25,7 @@ To preview the app, serve the repo root over HTTP (e.g. `npx serve .` or `python
 
 **Data flow:** USCIS site → `scraper/scrape.mjs` → `data.json` → `scraper/history.mjs` → `history/offices.json`. Both JSON files are committed; `index.html` fetches them at runtime from the same origin. The app never calls USCIS directly.
 
-**Why a real-browser scraper:** `egov.uscis.gov/processing-times` sits behind Cloudflare Turnstile, so plain HTTP and headless stealth browsers get 403. The scraper uses `puppeteer-real-browser` to drive a real Chrome, then operates the site's SPA form (`#formName` → `#formCategory` (160A) → `#officeSc` → `#buttonGetProcessingTime`) once per office and regex-parses the "80% of cases are completed within N months" text. Weeks/days are normalized to months. Office names like "San Jose CA" are split into `city`/`state`. Three retries are built in because the site is flaky: the Turnstile clear is attempted on up to three fresh page loads, the form selection is repeated if the office dropdown stays empty, and an office whose lookup times out is read once more.
+**Why a real-browser scraper:** `egov.uscis.gov/processing-times` sits behind Cloudflare Turnstile, so plain HTTP and headless stealth browsers get 403. The scraper uses `puppeteer-real-browser` to drive a real Chrome, then operates the site's SPA form (`#formName` → `#formCategory` (160A) → `#officeSc` → `#buttonGetProcessingTime`) once per office and regex-parses the "80% of cases are completed within N months" text. Weeks/days are normalized to months. Office names like "San Jose CA" are split into `city`/`state`. Retries are built in because the site is flaky: the Turnstile clear is attempted on two page loads in each of two freshly launched browser profiles, the form selection is repeated if the office dropdown stays empty, and an office whose lookup times out is read once more.
 
 **Real Google Chrome matters.** In CI, the Chromium build from the setup-chrome action was blocked by Cloudflare run after run; the Google Chrome preinstalled on GitHub's runner image (`/usr/bin/google-chrome`) clears it. Do not switch the workflow back to a Chromium build.
 
@@ -38,7 +38,7 @@ To preview the app, serve the repo root over HTTP (e.g. `npx serve .` or `python
 - `localStorage` keys `n400.overrides` (manual per-office value overrides from the in-app form) and `n400.baseline` (fallback delta baseline). `effMonths(code)` applies overrides over scraped values in the current-value UI only.
 - D3 and topojson-client are loaded from jsDelivr CDN; everything else is local.
 
-**GitHub Action (`.github/workflows/update.yml`):** runs the scraper at 11:17 and 23:41 UTC (two chances per day against Cloudflare) and on `workflow_dispatch`, under Xvfb, then rebuilds the history and commits both files if they changed. A Cloudflare block still happens some days; that is expected, and the next run refreshes.
+**GitHub Action (`.github/workflows/update.yml`):** runs the scraper at 11:17 and 23:41 UTC and on `workflow_dispatch`, under Xvfb, then rebuilds the history and commits both files if they changed. Cloudflare blocks are per runner IP, so when the scrape step fails the job dispatches itself again with `attempt+1` (needs `actions: write`) and the retry lands on a fresh runner; a run that handed off shows green with a warning annotation, and only the fourth consecutive blocked attempt shows red. The office list staying empty after the page cleared is the same block hitting the site's API and is handled the same way.
 
 ## Branches and deployment
 

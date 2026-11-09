@@ -1,20 +1,29 @@
 name: Refresh N-400 processing times
 
-# Runs the scraper and commits data.json when the numbers change.
-# NOTE: USCIS is behind Cloudflare's Turnstile challenge. This best-effort job
-# uses a real Chrome under a virtual display (Xvfb) via puppeteer-real-browser.
-# From a datacenter IP the challenge may occasionally block the run — that's the
-# expected failure mode. Your reliable path is `npm run scrape` on your own Mac
-# (see README), and the app's manual-entry fallback.
+# Scrapes USCIS, rebuilds history/offices.json and commits both files when the
+# numbers change. USCIS sits behind Cloudflare's Turnstile challenge, which
+# blocks some GitHub runner IPs outright. Reloading on the same runner rarely
+# helps, so when the scrape fails this job dispatches itself again (up to
+# MAX_ATTEMPTS in total) and the retry lands on a fresh runner with a new IP.
 
 on:
   schedule:
     - cron: '17 11 * * *'   # daily ~11:17 UTC
-    - cron: '41 23 * * *'   # second try ~23:41 UTC from a different runner, in case Cloudflare blocked the first
-  workflow_dispatch:        # manual "Run workflow" button
+    - cron: '41 23 * * *'   # second fire ~23:41 UTC
+  workflow_dispatch:        # manual "Run workflow" button; also used by the retry below
+    inputs:
+      attempt:
+        description: 'Attempt number (set automatically by retries; leave at 1)'
+        required: false
+        default: '1'
 
 permissions:
   contents: write
+  actions: write   # needed to dispatch the retry run
+
+env:
+  ATTEMPT: ${{ inputs.attempt || '1' }}
+  MAX_ATTEMPTS: '4'
 
 concurrency:
   group: refresh-data
@@ -46,15 +55,21 @@ jobs:
         run: npm ci
 
       - name: Scrape USCIS
+        id: scrape
+        continue-on-error: true
         env:
           CHROME_PATH: /usr/bin/google-chrome
           DISABLE_XVFB: 'true'
-        run: xvfb-run -a --server-args="-screen 0 1300x1000x24" node scraper/scrape.mjs
+        run: |
+          echo "Attempt $ATTEMPT of $MAX_ATTEMPTS"
+          xvfb-run -a --server-args="-screen 0 1300x1000x24" node scraper/scrape.mjs
 
       - name: Build per-office history
+        if: steps.scrape.outcome == 'success'
         run: node scraper/history.mjs
 
       - name: Commit if changed
+        if: steps.scrape.outcome == 'success'
         run: |
           if git diff --quiet -- data.json history/offices.json; then
             echo "No change in data.json."
@@ -64,4 +79,22 @@ jobs:
             git add data.json history/offices.json
             git commit -m "Update N-400 processing times ($(date -u +%Y-%m-%d))"
             git push
+          fi
+
+      # Cloudflare (or an empty office list, which is the same block hitting the
+      # site's API) is per-runner. Hand the job to a fresh runner instead of failing.
+      - name: Retry on a fresh runner
+        if: steps.scrape.outcome != 'success'
+        env:
+          GH_TOKEN: ${{ github.token }}
+          GH_REPO: ${{ github.repository }}
+        run: |
+          if [ "$ATTEMPT" -lt "$MAX_ATTEMPTS" ]; then
+            next=$((ATTEMPT + 1))
+            gh workflow run update.yml --ref "${{ github.ref_name }}" -f attempt="$next"
+            echo "::warning title=Scrape blocked on this runner::Dispatched attempt $next of $MAX_ATTEMPTS on a fresh runner."
+            echo "Scrape failed on attempt $ATTEMPT; dispatched attempt $next of $MAX_ATTEMPTS." >> "$GITHUB_STEP_SUMMARY"
+          else
+            echo "::error title=Scrape failed::All $MAX_ATTEMPTS attempts were blocked. The next scheduled fire will try again."
+            exit 1
           fi
