@@ -1,0 +1,49 @@
+name: Alert if data is stale
+
+# The refresh workflow stays green when Cloudflare blocks a runner, because that
+# is expected and retried. This job is the one that is allowed to go red: it
+# fails (and so emails the workflow owner) only when data.json has not been
+# updated for MAX_STALE_HOURS, i.e. every refresh for days has been blocked or
+# something else is quietly wrong. Run it by hand with a small max_stale_hours
+# to test the alert path.
+
+on:
+  schedule:
+    - cron: '37 15 * * *'   # daily ~15:37 UTC, after the night's refresh fires and their retries
+  workflow_dispatch:
+    inputs:
+      max_stale_hours:
+        description: 'Fail if data.json is older than this many hours'
+        required: false
+        default: '72'
+
+permissions:
+  contents: read
+  actions: read
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    env:
+      MAX_STALE_HOURS: ${{ inputs.max_stale_hours || '72' }}
+      GH_TOKEN: ${{ github.token }}
+      GH_REPO: ${{ github.repository }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Check age of data.json
+        run: |
+          updated=$(node -e 'console.log(JSON.parse(require("fs").readFileSync("data.json","utf8")).updated)')
+          age_h=$(node -e 'const u=new Date(process.argv[1]); console.log(Math.floor((Date.now()-u.getTime())/36e5))' "$updated")
+          echo "data.json updated: $updated ($age_h h ago); limit: $MAX_STALE_HOURS h"
+          echo "data.json was last updated **$updated** ($age_h hours ago). Limit: $MAX_STALE_HOURS hours." >> "$GITHUB_STEP_SUMMARY"
+          echo "" >> "$GITHUB_STEP_SUMMARY"
+          echo "Recent refresh runs:" >> "$GITHUB_STEP_SUMMARY"
+          gh run list --workflow=update.yml --limit 12 --json createdAt,conclusion,event \
+            --jq '.[] | "- " + .createdAt + " " + .event + " " + (.conclusion // "running")' >> "$GITHUB_STEP_SUMMARY" || true
+          if [ "$age_h" -gt "$MAX_STALE_HOURS" ]; then
+            echo "::error title=N-400 data is stale::data.json has not been updated for $age_h hours (limit $MAX_STALE_HOURS). Either Cloudflare has blocked every runner for days or the scraper is broken. Check the 'Refresh N-400 processing times' runs, or run 'npm run update' locally."
+            exit 1
+          fi
+          echo "Fresh enough."
