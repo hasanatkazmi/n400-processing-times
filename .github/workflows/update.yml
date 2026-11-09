@@ -8,8 +8,12 @@ name: Refresh N-400 processing times
 
 on:
   schedule:
-    - cron: '17 11 * * *'   # daily ~11:17 UTC
-    - cron: '41 23 * * *'   # second fire ~23:41 UTC
+    # Fires landing 02:00-04:00 UTC (US evening) have cleared Cloudflare 4 of 5
+    # times; fires landing 17:00-22:00 UTC failed 5 of 6. GitHub delays cron by
+    # 1-10 h, so these aim for the window that has worked. Keep off :00 minutes.
+    - cron: '23 1 * * *'    # ~01:23 UTC
+    - cron: '23 4 * * *'    # ~04:23 UTC
+    - cron: '23 7 * * *'    # ~07:23 UTC
   workflow_dispatch:        # manual "Run workflow" button; also used by the retry below
     inputs:
       attempt:
