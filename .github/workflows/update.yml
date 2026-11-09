@@ -3,8 +3,13 @@ name: Refresh N-400 processing times
 # Scrapes USCIS, rebuilds history/offices.json and commits both files when the
 # numbers change. USCIS sits behind Cloudflare's Turnstile challenge, which
 # blocks some GitHub runner IPs outright. Reloading on the same runner rarely
-# helps, so when the scrape fails this job dispatches itself again (up to
-# MAX_ATTEMPTS in total) and the retry lands on a fresh runner with a new IP.
+# helps, so when the scraper reports "blocked" (exit code 2) this job dispatches
+# itself again (up to MAX_ATTEMPTS in total) and the retry lands on a fresh
+# runner with a new IP.
+#
+# Notifications: a blocked scrape never fails the run, so it sends no email.
+# Only a real scraper error (exit code 1) fails the run. Persistent blocking is
+# caught by stale-check.yml, which fails (and emails) once data.json is 3 days old.
 
 on:
   schedule:
@@ -58,22 +63,31 @@ jobs:
       - name: Install dependencies
         run: npm ci
 
+      # Exit 0 = data written. Exit 2 = blocked by Cloudflare / the site's API
+      # (handled quietly below). Exit 1 = a real error, which fails the run loudly.
       - name: Scrape USCIS
         id: scrape
-        continue-on-error: true
         env:
           CHROME_PATH: /usr/bin/google-chrome
           DISABLE_XVFB: 'true'
         run: |
           echo "Attempt $ATTEMPT of $MAX_ATTEMPTS"
+          set +e
           xvfb-run -a --server-args="-screen 0 1300x1000x24" node scraper/scrape.mjs
+          code=$?
+          set -e
+          echo "code=$code" >> "$GITHUB_OUTPUT"
+          if [ "$code" -ne 0 ] && [ "$code" -ne 2 ]; then
+            echo "::error title=Scraper error::The scraper failed for a reason other than being blocked (exit $code). See the log above."
+            exit "$code"
+          fi
 
       - name: Build per-office history
-        if: steps.scrape.outcome == 'success'
+        if: steps.scrape.outputs.code == '0'
         run: node scraper/history.mjs
 
       - name: Commit if changed
-        if: steps.scrape.outcome == 'success'
+        if: steps.scrape.outputs.code == '0'
         run: |
           if git diff --quiet -- data.json history/offices.json; then
             echo "No change in data.json."
@@ -86,9 +100,10 @@ jobs:
           fi
 
       # Cloudflare (or an empty office list, which is the same block hitting the
-      # site's API) is per-runner. Hand the job to a fresh runner instead of failing.
+      # site's API) is per-runner. Hand the job to a fresh runner. This never fails
+      # the run: being blocked is expected, and stale-check.yml emails if it persists.
       - name: Retry on a fresh runner
-        if: steps.scrape.outcome != 'success'
+        if: steps.scrape.outputs.code == '2'
         env:
           GH_TOKEN: ${{ github.token }}
           GH_REPO: ${{ github.repository }}
@@ -96,9 +111,9 @@ jobs:
           if [ "$ATTEMPT" -lt "$MAX_ATTEMPTS" ]; then
             next=$((ATTEMPT + 1))
             gh workflow run update.yml --ref "${{ github.ref_name }}" -f attempt="$next"
-            echo "::warning title=Scrape blocked on this runner::Dispatched attempt $next of $MAX_ATTEMPTS on a fresh runner."
-            echo "Scrape failed on attempt $ATTEMPT; dispatched attempt $next of $MAX_ATTEMPTS." >> "$GITHUB_STEP_SUMMARY"
+            echo "::warning title=Blocked on this runner::Dispatched attempt $next of $MAX_ATTEMPTS on a fresh runner."
+            echo "Blocked on attempt $ATTEMPT; dispatched attempt $next of $MAX_ATTEMPTS." >> "$GITHUB_STEP_SUMMARY"
           else
-            echo "::error title=Scrape failed::All $MAX_ATTEMPTS attempts were blocked. The next scheduled fire will try again."
-            exit 1
+            echo "::warning title=Blocked on all runners::All $MAX_ATTEMPTS attempts were blocked this fire. The next scheduled fire will try again; stale-check.yml emails if data.json goes 3 days without an update."
+            echo "Blocked on all $MAX_ATTEMPTS attempts this fire." >> "$GITHUB_STEP_SUMMARY"
           fi

@@ -29,6 +29,11 @@ const CATEGORY = '160A'; // "Application for Naturalization"
 const ONLY = (process.env.ONLY || '').split(',').map((s) => s.trim()).filter(Boolean);
 
 const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
+
+// Thrown when USCIS/Cloudflare is refusing this client rather than the scraper
+// being broken. Exits with code 2 so the workflow can retry quietly on a fresh
+// runner; every other failure exits 1 and should be looked at.
+class Blocked extends Error {}
 const esc = (s) => s.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
 
 function chromePath() {
@@ -130,7 +135,7 @@ async function openSite(launches = 2) {
     if (await clearChallenge(page, 2)) return { browser, page };
     await browser.close().catch(() => {});
   }
-  throw new Error('Could not clear Cloudflare challenge.');
+  throw new Blocked('Could not clear Cloudflare challenge.');
 }
 
 async function main() {
@@ -153,7 +158,7 @@ async function main() {
     const offices = ONLY.length ? all.filter((o) => ONLY.includes(o.v)) : all;
     console.error(`Found ${all.length} offices for ${FORM}` +
       (ONLY.length ? `, ${offices.length} matching ONLY=${ONLY.join(',')}.` : '.'));
-    if (!offices.length) throw new Error('No offices returned.');
+    if (!offices.length) throw new Blocked('No offices returned.');
 
     const results = [];
     for (let idx = 0; idx < offices.length; idx++) {
@@ -199,13 +204,13 @@ async function main() {
     await writeFile(OUT, JSON.stringify(payload, null, 2));
     const ok = results.filter((r) => r.months != null).length;
     console.error(`\nWrote ${OUT} — ${ok}/${results.length} offices with data.`);
-    if (ok === 0) throw new Error('No offices produced data — treating as failure.');
+    if (ok === 0) throw new Blocked('No offices produced data — treating as blocked.');
   } finally {
     await browser.close();
   }
 }
 
 main().catch((e) => {
-  console.error('FATAL:', e.stack || e.message);
-  process.exit(1);
+  console.error('FATAL:', e instanceof Blocked ? e.message : (e.stack || e.message));
+  process.exit(e instanceof Blocked ? 2 : 1);
 });
