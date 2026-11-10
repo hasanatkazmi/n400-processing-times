@@ -5,7 +5,7 @@
   "unit": "months",
   "note": "80% of cases are completed within this many months",
   "source": "https://egov.uscis.gov/processing-times/",
-  "updated": "2026-11-10T12:50:32.612Z",
+  "updated": "2026-11-10T15:43:45.774Z",
   "offices": [
     {
       "code": "AGA",
@@ -173,7 +173,7 @@
       "office": "Detroit MI",
       "city": "Detroit",
       "state": "MI",
-      "months": 13
+      "months": null
     },
     {
       "code": "ELP",
@@ -639,7 +639,7 @@
     }
   ],
   "previous": {
-    "updated": "2026-11-10T08:34:28.477Z",
+    "updated": "2026-11-10T12:50:32.612Z",
     "byCode": {
       "AGA": 13,
       "ALB": 10,
