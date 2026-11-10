@@ -5,7 +5,7 @@
   "unit": "months",
   "note": "80% of cases are completed within this many months",
   "source": "https://egov.uscis.gov/processing-times/",
-  "updated": "2026-11-10T08:34:28.477Z",
+  "updated": "2026-11-10T12:50:32.612Z",
   "offices": [
     {
       "code": "AGA",
@@ -639,7 +639,7 @@
     }
   ],
   "previous": {
-    "updated": "2026-11-08T02:43:35.974Z",
+    "updated": "2026-11-10T08:34:28.477Z",
     "byCode": {
       "AGA": 13,
       "ALB": 10,
