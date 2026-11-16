@@ -5,7 +5,7 @@
   "unit": "months",
   "note": "80% of cases are completed within this many months",
   "source": "https://egov.uscis.gov/processing-times/",
-  "updated": "2026-11-16T08:08:53.182Z",
+  "updated": "2026-11-16T13:05:23.988Z",
   "offices": [
     {
       "code": "AGA",
@@ -110,7 +110,7 @@
       "office": "Chicago IL",
       "city": "Chicago",
       "state": "IL",
-      "months": 13
+      "months": null
     },
     {
       "code": "CHR",
@@ -639,7 +639,7 @@
     }
   ],
   "previous": {
-    "updated": "2026-11-15T14:51:24.476Z",
+    "updated": "2026-11-16T08:08:53.182Z",
     "byCode": {
       "AGA": 13,
       "ALB": 10,
