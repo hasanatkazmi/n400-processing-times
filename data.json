@@ -5,7 +5,7 @@
   "unit": "months",
   "note": "80% of cases are completed within this many months",
   "source": "https://egov.uscis.gov/processing-times/",
-  "updated": "2026-11-16T13:05:23.988Z",
+  "updated": "2026-11-16T17:10:51.023Z",
   "offices": [
     {
       "code": "AGA",
@@ -110,7 +110,7 @@
       "office": "Chicago IL",
       "city": "Chicago",
       "state": "IL",
-      "months": null
+      "months": 13
     },
     {
       "code": "CHR",
@@ -215,7 +215,7 @@
       "office": "Harlingen TX",
       "city": "Harlingen",
       "state": "TX",
-      "months": 11.5
+      "months": null
     },
     {
       "code": "HAR",
@@ -639,7 +639,7 @@
     }
   ],
   "previous": {
-    "updated": "2026-11-16T08:08:53.182Z",
+    "updated": "2026-11-16T13:05:23.988Z",
     "byCode": {
       "AGA": 13,
       "ALB": 10,
@@ -655,7 +655,6 @@
       "CHL": 11.5,
       "CHA": 11.5,
       "CLT": 11,
-      "CHI": 13,
       "CHR": 11.5,
       "CIN": 9.5,
       "CLE": 10.5,
