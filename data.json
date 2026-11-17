@@ -5,7 +5,7 @@
   "unit": "months",
   "note": "80% of cases are completed within this many months",
   "source": "https://egov.uscis.gov/processing-times/",
-  "updated": "2026-11-16T17:10:51.023Z",
+  "updated": "2026-11-17T09:23:13.229Z",
   "offices": [
     {
       "code": "AGA",
@@ -215,7 +215,7 @@
       "office": "Harlingen TX",
       "city": "Harlingen",
       "state": "TX",
-      "months": null
+      "months": 11.5
     },
     {
       "code": "HAR",
@@ -639,7 +639,7 @@
     }
   ],
   "previous": {
-    "updated": "2026-11-16T13:05:23.988Z",
+    "updated": "2026-11-16T17:10:51.023Z",
     "byCode": {
       "AGA": 13,
       "ALB": 10,
@@ -655,6 +655,7 @@
       "CHL": 11.5,
       "CHA": 11.5,
       "CLT": 11,
+      "CHI": 13,
       "CHR": 11.5,
       "CIN": 9.5,
       "CLE": 10.5,
@@ -669,7 +670,6 @@
       "FSA": 11,
       "FRE": 15.5,
       "GRR": 10,
-      "HLG": 11.5,
       "HAR": 11.5,
       "HEL": 9.5,
       "HIA": 9.5,
