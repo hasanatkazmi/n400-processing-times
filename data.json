@@ -5,7 +5,7 @@
   "unit": "months",
   "note": "80% of cases are completed within this many months",
   "source": "https://egov.uscis.gov/processing-times/",
-  "updated": "2026-11-19T08:58:58.839Z",
+  "updated": "2026-11-19T13:42:53.165Z",
   "offices": [
     {
       "code": "AGA",
@@ -243,7 +243,7 @@
       "office": "Honolulu HI",
       "city": "Honolulu",
       "state": "HI",
-      "months": null
+      "months": 12.5
     },
     {
       "code": "HOU",
@@ -639,7 +639,7 @@
     }
   ],
   "previous": {
-    "updated": "2026-11-18T16:33:47.071Z",
+    "updated": "2026-11-19T08:58:58.839Z",
     "byCode": {
       "AGA": 13,
       "ALB": 10,
@@ -674,7 +674,6 @@
       "HAR": 11.5,
       "HEL": 9.5,
       "HIA": 9.5,
-      "HHW": 12.5,
       "HOU": 12,
       "IMP": 14.5,
       "INP": 14,
