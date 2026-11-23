@@ -5,7 +5,7 @@
   "unit": "months",
   "note": "80% of cases are completed within this many months",
   "source": "https://egov.uscis.gov/processing-times/",
-  "updated": "2026-11-22T15:29:07.363Z",
+  "updated": "2026-11-23T09:26:29.683Z",
   "offices": [
     {
       "code": "AGA",
@@ -187,7 +187,7 @@
       "office": "Fort Myers FL",
       "city": "Fort Myers",
       "state": "FL",
-      "months": 19
+      "months": null
     },
     {
       "code": "FSA",
@@ -201,7 +201,7 @@
       "office": "Fresno CA",
       "city": "Fresno",
       "state": "CA",
-      "months": 17
+      "months": null
     },
     {
       "code": "GRR",
@@ -215,7 +215,7 @@
       "office": "Harlingen TX",
       "city": "Harlingen",
       "state": "TX",
-      "months": 12.5
+      "months": null
     },
     {
       "code": "HAR",
@@ -341,7 +341,7 @@
       "office": "Memphis TN",
       "city": "Memphis",
       "state": "TN",
-      "months": 13.5
+      "months": null
     },
     {
       "code": "MIA",
@@ -639,7 +639,7 @@
     }
   ],
   "previous": {
-    "updated": "2026-11-22T12:45:03.314Z",
+    "updated": "2026-11-22T15:29:07.363Z",
     "byCode": {
       "AGA": 14,
       "ALB": 12.5,
