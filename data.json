@@ -5,7 +5,7 @@
   "unit": "months",
   "note": "80% of cases are completed within this many months",
   "source": "https://egov.uscis.gov/processing-times/",
-  "updated": "2026-11-23T15:02:49.576Z",
+  "updated": "2026-11-23T19:20:27.519Z",
   "offices": [
     {
       "code": "AGA",
@@ -639,7 +639,7 @@
     }
   ],
   "previous": {
-    "updated": "2026-11-23T09:26:29.683Z",
+    "updated": "2026-11-23T15:02:49.576Z",
     "byCode": {
       "AGA": 14,
       "ALB": 12.5,
@@ -666,8 +666,11 @@
       "DSM": 15.5,
       "DET": 15,
       "ELP": 13,
+      "OFM": 19,
       "FSA": 13,
+      "FRE": 17,
       "GRR": 12,
+      "HLG": 12.5,
       "HAR": 14,
       "HEL": 13,
       "HIA": 12.5,
@@ -685,6 +688,7 @@
       "LAC": 13,
       "LOU": 15,
       "MAN": 12,
+      "MEM": 13.5,
       "MIA": 13,
       "MIL": 15,
       "SPM": 16,
