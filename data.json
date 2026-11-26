@@ -5,7 +5,7 @@
   "unit": "months",
   "note": "80% of cases are completed within this many months",
   "source": "https://egov.uscis.gov/processing-times/",
-  "updated": "2026-11-26T14:10:50.558Z",
+  "updated": "2026-11-26T17:54:57.141Z",
   "offices": [
     {
       "code": "AGA",
@@ -299,7 +299,7 @@
       "office": "Lawrence MA",
       "city": "Lawrence",
       "state": "MA",
-      "months": 20
+      "months": null
     },
     {
       "code": "LNY",
@@ -639,7 +639,7 @@
     }
   ],
   "previous": {
-    "updated": "2026-11-26T09:50:24.586Z",
+    "updated": "2026-11-26T14:10:50.558Z",
     "byCode": {
       "AGA": 14,
       "ALB": 12.5,
