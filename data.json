@@ -5,7 +5,7 @@
   "unit": "months",
   "note": "80% of cases are completed within this many months",
   "source": "https://egov.uscis.gov/processing-times/",
-  "updated": "2026-11-27T09:48:08.004Z",
+  "updated": "2026-11-27T14:04:34.755Z",
   "offices": [
     {
       "code": "AGA",
@@ -639,7 +639,7 @@
     }
   ],
   "previous": {
-    "updated": "2026-11-26T17:54:57.141Z",
+    "updated": "2026-11-27T09:48:08.004Z",
     "byCode": {
       "AGA": 14,
       "ALB": 12.5,
@@ -682,6 +682,7 @@
       "KAN": 14,
       "KND": 13,
       "LVG": 15.5,
+      "LAW": 20,
       "LNY": 14.5,
       "LOS": 14.5,
       "LAC": 13,
